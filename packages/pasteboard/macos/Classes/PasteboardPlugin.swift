@@ -39,6 +39,25 @@ public class PasteboardPlugin: NSObject, FlutterPlugin {
     result(nil)
   }
 
+  private func html(result: FlutterResult) {
+    guard let html = NSPasteboard.general.data(forType: .rtf) else {
+      result(nil)
+      return
+    }
+    guard let attrStr = NSAttributedString(rtf: boardRtf, documentAttributes: nil) else {
+      result(nil)
+      return
+    }
+    guard let htmlData = try? attrStr.data(
+        from: NSRange(location: 0, length: attrStr.length),
+        documentAttributes: [.documentType: NSAttributedString.DocumentType.html])
+    else {
+      result(nil)
+      return
+    }
+    result(String(data: htmlData, encoding: String.Encoding.utf8))
+  }
+  
   private func image(result: FlutterResult) {
     guard let image = NSPasteboard.general.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage else {
       result(nil)
